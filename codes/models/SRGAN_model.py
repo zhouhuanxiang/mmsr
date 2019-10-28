@@ -225,6 +225,14 @@ class SRGANModel(BaseModel):
             out_dict['GT'] = self.var_H.detach()[0].float().cpu()
         return out_dict
 
+    def get_current_visuals_all(self, need_GT=True):
+        out_dict = OrderedDict()
+        out_dict['LQ'] = self.var_L.detach().float().cpu()
+        out_dict['rlt'] = self.fake_H.detach().float().cpu()
+        if need_GT:
+            out_dict['GT'] = self.var_H.detach().float().cpu()
+        return out_dict
+
     def print_network(self):
         # Generator
         s, n = self.get_network_description(self.netG)

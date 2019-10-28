@@ -52,10 +52,14 @@ class VideoBaseModel(BaseModel):
             if train_opt['ft_tsa_only']:
                 normal_params = []
                 tsa_fusion_params = []
+                dcn_params = []
                 for k, v in self.netG.named_parameters():
                     if v.requires_grad:
                         if 'tsa_fusion' in k:
                             tsa_fusion_params.append(v)
+                        elif 'dcn' in k:
+                            print('*******', k)
+                            dcn_params.append(v)
                         else:
                             normal_params.append(v)
                     else:
@@ -73,9 +77,14 @@ class VideoBaseModel(BaseModel):
                 ]
             else:
                 optim_params = []
+                dcn_params = []
                 for k, v in self.netG.named_parameters():
                     if v.requires_grad:
-                        optim_params.append(v)
+                        if 'dcn' in k:
+                            print('*******', k)
+                            dcn_params.append(k)
+                        else:
+                            optim_params.append(v)
                     else:
                         if self.rank <= 0:
                             logger.warning('Params [{:s}] will not optimize.'.format(k))
@@ -83,7 +92,11 @@ class VideoBaseModel(BaseModel):
             self.optimizer_G = torch.optim.Adam(optim_params, lr=train_opt['lr_G'],
                                                 weight_decay=wd_G,
                                                 betas=(train_opt['beta1'], train_opt['beta2']))
+            self.optimizer_G_dcn = torch.optim.Adam(optim_params, lr=train_opt['lr_G'] * 0.1,
+                                                weight_decay=wd_G,
+                                                betas=(train_opt['beta1'], train_opt['beta2']))
             self.optimizers.append(self.optimizer_G)
+            self.optimizers.append(self.optimizer_G_dcn)
 
             #### schedulers
             if train_opt['lr_scheme'] == 'MultiStepLR':
@@ -119,11 +132,13 @@ class VideoBaseModel(BaseModel):
             self.set_params_lr_zero()
 
         self.optimizer_G.zero_grad()
+        self.optimizer_G_dcn.zero_grad()
         self.fake_H = self.netG(self.var_L)
 
         l_pix = self.l_pix_w * self.cri_pix(self.fake_H, self.real_H)
         l_pix.backward()
         self.optimizer_G.step()
+        self.optimizer_G_dcn.step()
 
         # set log
         self.log_dict['l_pix'] = l_pix.item()
