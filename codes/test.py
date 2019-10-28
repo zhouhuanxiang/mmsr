@@ -1,3 +1,4 @@
+import os
 import os.path as osp
 import logging
 import time
@@ -46,13 +47,25 @@ for test_loader in test_loaders:
     test_results['psnr_y'] = []
     test_results['ssim_y'] = []
 
+    time_total = 0.0
+    time_cnt = 0
     for data in test_loader:
         need_GT = False if test_loader.dataset.opt['dataroot_GT'] is None else True
+        need_GT = False
         model.feed_data(data, need_GT=need_GT)
         img_path = data['GT_path'][0] if need_GT else data['LQ_path'][0]
-        img_name = osp.splitext(osp.basename(img_path))[0]
+        # img_name = osp.splitext(osp.basename(img_path))[0]
+        img_name = img_path.split('/')[-1]
+        img_name = img_name.split('.')[0]
+        video_name = img_path.split('/')[-2]
 
+        # time1 = time.time()
+        # for i in range(50):
+        #     model.test()
+        # time2 = time.time()
+        # print(1 / (time2 - time1) * 50)
         model.test()
+
         visuals = model.get_current_visuals(need_GT=need_GT)
 
         sr_img = util.tensor2img(visuals['rlt'])  # uint8
@@ -62,7 +75,8 @@ for test_loader in test_loaders:
         if suffix:
             save_img_path = osp.join(dataset_dir, img_name + suffix + '.png')
         else:
-            save_img_path = osp.join(dataset_dir, img_name + '.png')
+            os.makedirs(os.path.join(dataset_dir, video_name), exist_ok=True)
+            save_img_path = osp.join(dataset_dir, video_name, img_name + '.png')
         util.save_img(sr_img, save_img_path)
 
         # calculate PSNR and SSIM

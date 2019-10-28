@@ -78,7 +78,7 @@ def main():
                 logger.info(
                     'You are using PyTorch {}. Tensorboard will use [tensorboardX]'.format(version))
                 from tensorboardX import SummaryWriter
-            tb_logger = SummaryWriter(log_dir='../tb_logger/' + opt['name'])
+            tb_logger = SummaryWriter(log_dir='/home/web_server/zhouhuanxiang/disk/tb_logger/' + opt['name'])
     else:
         util.setup_logger('base', opt['path']['log'], 'train', level=logging.INFO, screen=True)
         logger = logging.getLogger('base')
@@ -182,6 +182,7 @@ def main():
                     for val_data in val_loader:
                         idx += 1
                         img_name = os.path.splitext(os.path.basename(val_data['LQ_path'][0]))[0]
+                        # Make save folder
                         img_dir = os.path.join(opt['path']['val_images'], img_name)
                         util.mkdir(img_dir)
 
@@ -194,7 +195,9 @@ def main():
 
                         # Save SR images for reference
                         save_img_path = os.path.join(img_dir,
-                                                     '{:s}_{:d}.png'.format(img_name, current_step))
+                                                     '{:s}.png'.format(img_name))
+                        # save_img_path = os.path.join(img_dir,
+                        #                              '{:s}_{:d}.png'.format(img_name, current_step))
                         util.save_img(sr_img, save_img_path)
 
                         # calculate PSNR
