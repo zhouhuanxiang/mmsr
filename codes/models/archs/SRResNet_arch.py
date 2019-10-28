@@ -14,7 +14,6 @@ class MSRResNet(nn.Module):
         self.conv_first = nn.Conv2d(in_nc, nf, 3, 1, 1, bias=True)
         basic_block = functools.partial(arch_util.ResidualBlock_noBN, nf=nf)
         self.recon_trunk = arch_util.make_layer(basic_block, nb)
-
         # upsampling
         if self.upscale == 2:
             self.upconv1 = nn.Conv2d(nf, nf * 4, 3, 1, 1, bias=True)
@@ -26,6 +25,8 @@ class MSRResNet(nn.Module):
             self.upconv1 = nn.Conv2d(nf, nf * 4, 3, 1, 1, bias=True)
             self.upconv2 = nn.Conv2d(nf, nf * 4, 3, 1, 1, bias=True)
             self.pixel_shuffle = nn.PixelShuffle(2)
+        elif self.upscale == 1:
+            self.upconv1 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
 
         self.HRconv = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
         self.conv_last = nn.Conv2d(nf, out_nc, 3, 1, 1, bias=True)
@@ -48,6 +49,8 @@ class MSRResNet(nn.Module):
             out = self.lrelu(self.pixel_shuffle(self.upconv2(out)))
         elif self.upscale == 3 or self.upscale == 2:
             out = self.lrelu(self.pixel_shuffle(self.upconv1(out)))
+        elif self.upscale == 1:
+            out = self.lrelu(self.upconv1(out))
 
         out = self.conv_last(self.lrelu(self.HRconv(out)))
         base = F.interpolate(x, scale_factor=self.upscale, mode='bilinear', align_corners=False)
