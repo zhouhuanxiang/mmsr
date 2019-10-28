@@ -9,11 +9,51 @@ from utils import util  # noqa: E402
 
 
 def main():
-    dataset = 'DIV2K800_sub'  # REDS | Vimeo90K | DIV2K800_sub
+    dataset = 'KWAI'  # REDS | Vimeo90K | DIV2K800_sub
     opt = {}
     opt['dist'] = False
     opt['gpu_ids'] = [0]
-    if dataset == 'REDS':
+    if dataset == 'LQGT':
+        opt['name'] = 'test_KWAI'
+        opt['dataroot_GT'] = '/home/web_server/zhouhuanxiang/disk/data/HD_UGC_raw'
+        opt['dataroot_LQ'] = '/home/web_server/zhouhuanxiang/disk/data/HD_UGC_crf40_raw'
+        opt['mode'] = 'LQGT'
+        opt['color'] = 'RGB'
+        opt['phase'] = 'train'
+        opt['use_shuffle'] = True
+        opt['n_workers'] = 1
+        opt['batch_size'] = 4
+        opt['GT_size'] = 256
+        opt['LQ_size'] = 256
+        opt['scale'] = 1
+        opt['use_flip'] = True
+        opt['use_rot'] = True
+        opt['interval_list'] = [1]
+        opt['random_reverse'] = False
+        opt['border_mode'] = False
+        opt['cache_keys'] = None
+        opt['data_type'] = 'img'  # img | lmdb | mc
+    elif dataset == 'KWAI':
+        opt['name'] = 'test_KWAI'
+        opt['dataroot_GT'] = '/home/web_server/zhouhuanxiang/disk/vdata/HD_UGC.lmdb'
+        opt['dataroot_LQ'] = '/home/web_server/zhouhuanxiang/disk/vdata/HD_UGC_crf40.lmdb'
+        opt['mode'] = 'KWAI'
+        opt['N_frames'] = 5
+        opt['phase'] = 'train'
+        opt['use_shuffle'] = True
+        opt['n_workers'] = 1
+        opt['batch_size'] = 4
+        opt['GT_size'] = 256
+        opt['LQ_size'] = 256
+        opt['scale'] = 1
+        opt['use_flip'] = True
+        opt['use_rot'] = True
+        opt['interval_list'] = [1]
+        opt['random_reverse'] = False
+        opt['border_mode'] = False
+        opt['cache_keys'] = None
+        opt['data_type'] = 'lmdb'  # img | lmdb | mc
+    elif dataset == 'REDS':
         opt['name'] = 'test_REDS'
         opt['dataroot_GT'] = '../../datasets/REDS/train_sharp_wval.lmdb'
         opt['dataroot_LQ'] = '../../datasets/REDS/train_sharp_bicubic_wval.lmdb'
@@ -71,7 +111,7 @@ def main():
     else:
         raise ValueError('Please implement by yourself.')
 
-    util.mkdir('tmp')
+    util.mkdir('/home/web_server/zhouhuanxiang/tmp')
     train_set = create_dataset(opt)
     train_loader = create_dataloader(train_set, opt, opt, None)
     nrow = int(math.sqrt(opt['batch_size']))
@@ -82,21 +122,22 @@ def main():
         if i > 5:
             break
         print(i)
-        if dataset == 'REDS' or dataset == 'Vimeo90K':
+        if dataset == 'REDS' or dataset == 'Vimeo90K' or dataset == 'KWAI':
             LQs = data['LQs']
         else:
             LQ = data['LQ']
         GT = data['GT']
 
-        if dataset == 'REDS' or dataset == 'Vimeo90K':
+        if dataset == 'REDS' or dataset == 'Vimeo90K' or dataset == 'KWAI':
             for j in range(LQs.size(1)):
+                print(range(LQs.size(1)))
                 torchvision.utils.save_image(LQs[:, j, :, :, :],
-                                             'tmp/LQ_{:03d}_{}.png'.format(i, j), nrow=nrow,
+                                             '/home/web_server/zhouhuanxiang/tmp/LQ_{:03d}_{}.png'.format(i, j), nrow=nrow,
                                              padding=padding, normalize=False)
         else:
-            torchvision.utils.save_image(LQ, 'tmp/LQ_{:03d}.png'.format(i), nrow=nrow,
+            torchvision.utils.save_image(LQ, '/home/web_server/zhouhuanxiang/tmp/LQ_{:03d}.png'.format(i), nrow=nrow,
                                          padding=padding, normalize=False)
-        torchvision.utils.save_image(GT, 'tmp/GT_{:03d}.png'.format(i), nrow=nrow, padding=padding,
+        torchvision.utils.save_image(GT, '/home/web_server/zhouhuanxiang/tmp/GT_{:03d}.png'.format(i), nrow=nrow, padding=padding,
                                      normalize=False)
 
 
