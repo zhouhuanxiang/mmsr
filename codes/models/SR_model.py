@@ -7,7 +7,7 @@ from torch.nn.parallel import DataParallel, DistributedDataParallel
 import models.networks as networks
 import models.lr_scheduler as lr_scheduler
 from .base_model import BaseModel
-from models.loss import CharbonnierLoss
+from models.loss import CharbonnierLoss, ContextualLoss
 
 logger = logging.getLogger('base')
 
@@ -35,7 +35,7 @@ class SRModel(BaseModel):
         if self.is_train:
             self.netG.train()
 
-            # loss
+            # pixel loss
             loss_type = train_opt['pixel_criterion']
             if loss_type == 'l1':
                 self.cri_pix = nn.L1Loss().to(self.device)
@@ -46,6 +46,26 @@ class SRModel(BaseModel):
             else:
                 raise NotImplementedError('Loss type [{:s}] is not recognized.'.format(loss_type))
             self.l_pix_w = train_opt['pixel_weight']
+
+            # CX loss
+            if train_opt['CX_weight']:
+                l_CX_type = train_opt['CX_criterion']
+                if l_CX_type == 'contextual_loss':
+                    self.cri_CX = ContextualLoss()
+                else:
+                    raise NotImplementedError('Loss type [{:s}] not recognized.'.format(l_CX_type))
+                self.l_CX_w = train_opt['CX_weight']
+            else:
+                logger.info('Remove CX loss.')
+                self.cri_CX = None
+
+            # load VGG perceptual loss if use CX loss
+            if train_opt['CX_weight']:
+                self.netF = networks.define_F(opt, use_bn=False).to(self.device)
+                if opt['dist']:
+                    pass  # do not need to use DistributedDataParallel for netF
+                else:
+                    self.netF = DataParallel(self.netF)
 
             # optimizers
             wd_G = train_opt['weight_decay_G'] if train_opt['weight_decay_G'] else 0
@@ -89,12 +109,22 @@ class SRModel(BaseModel):
     def optimize_parameters(self, step):
         self.optimizer_G.zero_grad()
         self.fake_H = self.netG(self.var_L)
+
+        l_g_total = 0
         l_pix = self.l_pix_w * self.cri_pix(self.fake_H, self.real_H)
-        l_pix.backward()
+        l_g_total += l_pix
+        if self.cri_CX:
+            real_fea = self.netF(self.real_H)
+            fake_fea = self.netF(self.fake_H)
+            l_CX = self.l_CX_w * self.cri_CX(real_fea, fake_fea)
+            l_g_total += l_CX
+        l_g_total.backward()
         self.optimizer_G.step()
 
         # set log
         self.log_dict['l_pix'] = l_pix.item()
+        if self.cri_CX:
+            self.log_dict['l_CX'] = l_CX.item()
 
     def test(self):
         self.netG.eval()

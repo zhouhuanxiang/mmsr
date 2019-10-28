@@ -3,6 +3,7 @@ results/*
 tb_logger/*
 datasets/*
 .vscode
+.DS_store
 
 *.html
 *.png
