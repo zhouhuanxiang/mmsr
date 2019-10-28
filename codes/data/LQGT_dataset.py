@@ -23,6 +23,13 @@ class LQGTDataset(data.Dataset):
 
         self.paths_GT, self.sizes_GT = util.get_image_paths(self.data_type, opt['dataroot_GT'])
         self.paths_LQ, self.sizes_LQ = util.get_image_paths(self.data_type, opt['dataroot_LQ'])
+        if self.opt['phase'] == 'val' :
+            self.paths_GT = self.paths_GT[500:3500:150]
+            self.paths_LQ = self.paths_LQ[500:3500:150]   
+            # self.paths_GT = self.paths_GT[:10]
+            # self.paths_LQ = self.paths_LQ[:10]
+            self.sizes_GT = len(self.paths_GT)
+            self.sizes_LQ = len(self.paths_LQ)
         assert self.paths_GT, 'Error: GT path is empty.'
         if self.paths_LQ and self.paths_GT:
             assert len(self.paths_LQ) == len(

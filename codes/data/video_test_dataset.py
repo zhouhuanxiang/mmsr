@@ -26,7 +26,7 @@ class VideoTestDataset(data.Dataset):
             raise ValueError('No need to use LMDB during validation/test.')
         #### Generate data info and cache data
         self.imgs_LQ, self.imgs_GT = {}, {}
-        if opt['name'].lower() in ['vid4', 'reds4']:
+        if opt['name'].lower() in ['vid4', 'reds4', 'kwai-test']:
             subfolders_LQ = util.glob_file_list(self.LQ_root)
             subfolders_GT = util.glob_file_list(self.GT_root)
             for subfolder_LQ, subfolder_GT in zip(subfolders_LQ, subfolders_GT):
