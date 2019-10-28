@@ -192,6 +192,22 @@ def single_forward(model, inp):
     output = output.data.float().cpu()
     return output
 
+def single_forward_all_results(model, inp):
+    """PyTorch model forward (single test), it is just a simple warpper
+    Args:
+        model (PyTorch model)
+        inp (Tensor): inputs defined by the model
+
+    Returns:
+        output (Tensor): all outputs of the model including midlle layer results. float, in CPU
+    """
+    with torch.no_grad():
+        model_output = model(inp)
+        if isinstance(model_output, list) or isinstance(model_output, tuple):
+            output = [i.data.float().cpu() for i in model_output]
+        else:
+            output = model_output.data.float().cpu()
+    return output
 
 def flipx4_forward(model, inp):
     """Flip testing with X4 self ensemble, i.e., normal, flip H, flip W, flip H and W
