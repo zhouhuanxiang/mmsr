@@ -6,6 +6,7 @@ import numpy as np
 import glob
 import torch
 import cv2
+import glob
 
 ####################
 # Files & IO
@@ -28,6 +29,10 @@ def _get_paths_from_images(path):
             if is_image_file(fname):
                 img_path = os.path.join(dirpath, fname)
                 images.append(img_path)
+    if not images:
+        images = glob.glob(os.path.join(path, '*', '*', '*.png'))
+        images = sorted(images)
+        print(images[:10000:1000])
     assert images, '{:s} has no valid image file'.format(path)
     return images
 
