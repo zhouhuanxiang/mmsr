@@ -294,6 +294,10 @@ class EDVR(nn.Module):
             ]
             aligned_fea.append(self.pcd_align(nbr_fea_l, ref_fea_l))
         aligned_fea = torch.stack(aligned_fea, dim=1)  # [B, N, C, H, W]
+        # self.aligned_fea_detach = aligned_fea.detach()
+        # self.aligned_fea_detach = torch.mean(self.aligned_fea_detach, 2, keepdim=True)
+        # self.aligned_fea_detach = torch.max(torch.abs(self.aligned_fea_detach, 2), 2, keepdim=True)[0]
+        # self.aligned_fea_detach = self.aligned_fea_detach[:,:,0,:,:]
 
         if not self.w_TSA:
             aligned_fea = aligned_fea.view(B, -1, H, W)
@@ -309,4 +313,5 @@ class EDVR(nn.Module):
         else:
             base = F.interpolate(x_center, scale_factor=4, mode='bilinear', align_corners=False)
         out += base
+        # return out, self.aligned_fea_detach
         return out
