@@ -81,7 +81,7 @@ class VideoBaseModel(BaseModel):
                 for k, v in self.netG.named_parameters():
                     if v.requires_grad:
                         if 'dcn' in k:
-                            print('*******', k)
+                            print('***DCN***', k)
                             dcn_params.append(k)
                         else:
                             optim_params.append(v)

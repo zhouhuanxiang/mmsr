@@ -43,14 +43,14 @@ def parse(opt_path, is_train=True):
         if path and key in opt['path'] and key != 'strict_load':
             opt['path'][key] = osp.expanduser(path)
     # opt['path']['root'] = osp.abspath(osp.join(__file__, osp.pardir, osp.pardir, osp.pardir))
-    if not opt['path']['root']:
+    if not 'root' in opt['path'].keys():
         opt['path']['root'] = '/home/web_server/zhouhuanxiang/disk/log'
     if is_train:
         experiments_root = osp.join(opt['path']['root'], 'experiments', opt['name'])
         opt['path']['experiments_root'] = experiments_root
         opt['path']['models'] = osp.join(experiments_root, 'models')
         opt['path']['training_state'] = osp.join(experiments_root, 'training_state')
-        if not opt['path']['log']
+        if not 'log' in opt['path'].keys():
             # opt['path']['log'] = experiments_root
             opt['path']['log'] = osp.join(opt['path']['root'], 'tb_logger', opt['name'])
         opt['path']['val_images'] = osp.join(experiments_root, 'val_images')

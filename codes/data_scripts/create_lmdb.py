@@ -15,8 +15,8 @@ import utils.util as util  # noqa: E402
 
 
 def main():
-    dataset = 'KWAIVIDEO'  # vimeo90K | REDS | general (e.g., DIV2K, 291) | DIV2K_demo |test
-    mode = 'GT'  # used for vimeo90k and REDS datasets
+    dataset = 'vimeo90k'  # KWAIVIDEO | vimeo90K | REDS | general (e.g., DIV2K, 291) | DIV2K_demo |test
+    mode = 'LR'  # used for vimeo90k and REDS datasets
     crfs = ['40']
     # vimeo90k: GT | LR | flow
     # REDS: train_sharp, train_sharp_bicubic, train_blur_bicubic, train_blur, train_blur_comp
@@ -269,15 +269,16 @@ def vimeo90k(mode):
     # Set False for use limited memory
     BATCH = 5000  # After BATCH images, lmdb commits, if read_all_imgs = False
     if mode == 'GT':
-        img_folder = '../../datasets/vimeo90k/vimeo_septuplet/sequences'
-        lmdb_save_path = '../../datasets/vimeo90k/vimeo90k_train_GT.lmdb'
-        txt_file = '../../datasets/vimeo90k/vimeo_septuplet/sep_trainlist.txt'
+        img_folder = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences'
+        lmdb_save_path = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo90k_train_GT.lmdb'
+        txt_file = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sep_trainlist.txt'
         H_dst, W_dst = 256, 448
     elif mode == 'LR':
-        img_folder = '../../datasets/vimeo90k/vimeo_septuplet_matlabLRx4/sequences'
-        lmdb_save_path = '../../datasets/vimeo90k/vimeo90k_train_LR7frames.lmdb'
-        txt_file = '../../datasets/vimeo90k/vimeo_septuplet/sep_trainlist.txt'
-        H_dst, W_dst = 64, 112
+        img_folder = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky'
+        lmdb_save_path = '/media/disk6/fordata/web_server/zhouhuanxiang/vimeo/vimeo90k_train_blocky.lmdb'
+        txt_file = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sep_trainlist.txt'
+        # H_dst, W_dst = 64, 112
+        H_dst, W_dst = 256, 448
     elif mode == 'flow':
         img_folder = '../../datasets/vimeo90k/vimeo_septuplet/sequences_flowx4'
         lmdb_save_path = '../../datasets/vimeo90k/vimeo90k_train_flowx4.lmdb'
