@@ -21,10 +21,11 @@ network_G:
   nf: 64
   nb: 16
   upscale: 1
+  use_gpu: false
 
 #### path
 path:
-  pretrain_model_G: /home/web_server/zhouhuanxiang/disk/log/experiments/SRResNet_KWAI40_baseline/models/latest_G.pth
+  pretrain_model_G: /home/web_server/zhouhuanxiang/disk/log/experiments/SRResNet_KWAI40_baseline/models/90000_G.pth
   # root: '/media/disk1/fordata/web_server/zhouhuanxiang/log'
   root: '/home/web_server/zhouhuanxiang/log'
 

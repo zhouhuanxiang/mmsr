@@ -21,13 +21,18 @@ class SRModel(BaseModel):
         else:
             self.rank = -1  # non dist training
         train_opt = opt['train']
+        self.use_gpu = opt['network_G']['use_gpu']
 
         # define network and load pretrained models
-        self.netG = networks.define_G(opt).to(self.device)
-        if opt['dist']:
-            self.netG = DistributedDataParallel(self.netG, device_ids=[torch.cuda.current_device()])
+        if self.use_gpu:
+            self.netG = networks.define_G(opt).to(self.device)
+            if opt['dist']:
+                self.netG = DistributedDataParallel(self.netG, device_ids=[torch.cuda.current_device()])
+            else:
+                self.netG = DataParallel(self.netG)
         else:
-            self.netG = DataParallel(self.netG)
+            self.netG = networks.define_G(opt)
+
         # print network
         self.print_network()
         self.load()
@@ -102,9 +107,12 @@ class SRModel(BaseModel):
             self.log_dict = OrderedDict()
 
     def feed_data(self, data, need_GT=True):
-        self.var_L = data['LQ'].to(self.device)  # LQ
-        if need_GT:
-            self.real_H = data['GT'].to(self.device)  # GT
+        if self.use_gpu:
+            self.var_L = data['LQ'].to(self.device)  # LQ
+            if need_GT:
+                self.real_H = data['GT'].to(self.device)  # GT
+        else:
+            self.var_L = data['LQ']  # LQ
 
     def optimize_parameters(self, step):
         self.optimizer_G.zero_grad()
@@ -173,8 +181,12 @@ class SRModel(BaseModel):
 
     def get_current_visuals(self, need_GT=True):
         out_dict = OrderedDict()
-        out_dict['LQ'] = self.var_L.detach()[0].float().cpu()
-        out_dict['rlt'] = self.fake_H.detach()[0].float().cpu()
+        if self.use_gpu:
+            out_dict['LQ'] = self.var_L.detach()[0].float().cpu()
+            out_dict['rlt'] = self.fake_H.detach()[0].float().cpu()
+        else:
+            out_dict['LQ'] = self.var_L.detach()[0].float()
+            out_dict['rlt'] = self.fake_H.detach()[0].float()
         if need_GT:
             out_dict['GT'] = self.real_H.detach()[0].float().cpu()
         return out_dict
