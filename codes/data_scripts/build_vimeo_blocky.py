@@ -15,7 +15,7 @@ else:
 
 if mode == 'kwai27':
     prefix1 = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences'
-    prefix2 = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky'
+    prefix2 = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky32'
     ffmpeg = '/usr/local/share/ffmpeg_qlh/bin/ffmpeg '
 elif mode == 'kwai29':
     prefix = '/home/web_server/zhouhuanxiang/disk'
@@ -31,7 +31,7 @@ clips_blocky = [i.replace(prefix1, prefix2) for i in clips]
 for i, (clip, clip_blocky) in enumerate(zip(clips, clips_blocky)):
     # if i == 10:
     #     break
-    os.system('{} -i {}/im%d.png -c:v libx265 -x265-params qp=37:bframes=0:no-sao:loopfilter=0 /home/web_server/zhouhuanxiang/test.mp4'.format(ffmpeg, clip))
+    os.system('{} -i {}/im%d.png -c:v libx265 -x265-params qp=32:bframes=0:no-sao:loopfilter=0 /home/web_server/zhouhuanxiang/test.mp4'.format(ffmpeg, clip))
     os.makedirs(clip_blocky, exist_ok=True)
     os.system('{} -i /home/web_server/zhouhuanxiang/test.mp4 {}/im%d.png'.format(ffmpeg, clip_blocky))
     os.system('rm /home/web_server/zhouhuanxiang/test.mp4')

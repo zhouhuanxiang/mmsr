@@ -16,13 +16,15 @@ import utils.util as util  # noqa: E402
 
 def main():
     dataset = 'vimeo90k'  # KWAIVIDEO | vimeo90K | REDS | general (e.g., DIV2K, 291) | DIV2K_demo |test
-    mode = 'LR'  # used for vimeo90k and REDS datasets
+    mode = 'GT'  # used for vimeo90k and REDS datasets
     crfs = ['40']
+    stage = 'test'
+    qp = '37'
     # vimeo90k: GT | LR | flow
     # REDS: train_sharp, train_sharp_bicubic, train_blur_bicubic, train_blur, train_blur_comp
     #       train_sharp_flowx4
     if dataset == 'vimeo90k':
-        vimeo90k(mode)
+        vimeo90k(mode, stage, qp)
     elif dataset == 'REDS':
         REDS(mode)
     elif dataset == 'general':
@@ -251,7 +253,7 @@ def general_image_folder(opt):
     print('Finish creating lmdb meta info.')
 
 
-def vimeo90k(mode):
+def vimeo90k(mode, stage, qp):
     """Create lmdb for the Vimeo90K dataset, each image with a fixed size
     GT: [3, 256, 448]
         Now only need the 4th frame, e.g., 00001_0001_4
@@ -270,14 +272,13 @@ def vimeo90k(mode):
     BATCH = 5000  # After BATCH images, lmdb commits, if read_all_imgs = False
     if mode == 'GT':
         img_folder = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences'
-        lmdb_save_path = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo90k_train_GT.lmdb'
-        txt_file = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sep_trainlist.txt'
+        lmdb_save_path = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo90k_{}_GT.lmdb'.format(stage)
+        txt_file = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sep_{}list.txt'.format(stage)
         H_dst, W_dst = 256, 448
     elif mode == 'LR':
-        img_folder = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky'
-        lmdb_save_path = '/media/disk6/fordata/web_server/zhouhuanxiang/vimeo/vimeo90k_train_blocky.lmdb'
-        txt_file = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sep_trainlist.txt'
-        # H_dst, W_dst = 64, 112
+        img_folder = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky{}'.format(qp)
+        lmdb_save_path = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo90k_{}_blocky{}.lmdb'.format(stage, qp)
+        txt_file = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sep_{}list.txt'.format(stage)
         H_dst, W_dst = 256, 448
     elif mode == 'flow':
         img_folder = '../../datasets/vimeo90k/vimeo_septuplet/sequences_flowx4'

@@ -15,7 +15,7 @@ datasets:
     random_reverse: false
     border_mode: false
     dataroot_GT: /home/web_server/zhouhuanxiang/disk/vimeo/vimeo90k_train_GT.lmdb
-    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/vimeo/vimeo90k_train_blocky.lmdb
+    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/vimeo/vimeo90k_train_blocky37.lmdb
     cache_keys: ~
 
     N_frames: 7
@@ -42,9 +42,9 @@ network_G:
 
 #### path
 path:
-  pretrain_model_G: ~
+  pretrain_model_G: /home/web_server/zhouhuanxiang/disk/log/experiments/train_EDVR_Vimeo_woTSA_M/models/85000_G.pth
   strict_load: true
-  resume_state: ~
+  resume_state: /home/web_server/zhouhuanxiang/disk/log/experiments/train_EDVR_Vimeo_woTSA_M/training_state/85000.state
 
 #### training settings: learning rate scheme, loss
 train:
