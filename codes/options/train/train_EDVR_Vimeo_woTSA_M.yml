@@ -1,10 +1,10 @@
 #### general settings
-name: train_EDVR_Vimeo_woTSA_M
+name: EDVR_Vimeo_woTSA_M
 use_tb_logger: true
 model: video_base
 distortion: sr
 scale: 1
-gpu_ids: [0, 1, 2, 3]
+gpu_ids: [4,5,6,7]
 
 #### datasets
 datasets:
@@ -39,12 +39,13 @@ network_G:
   predeblur: false
   HR_in: true
   w_TSA: false
+  w_GCB: false
 
 #### path
 path:
-  pretrain_model_G: /home/web_server/zhouhuanxiang/disk/log/experiments/train_EDVR_Vimeo_woTSA_M/models/85000_G.pth
+  pretrain_model_G: ~
   strict_load: true
-  resume_state: /home/web_server/zhouhuanxiang/disk/log/experiments/train_EDVR_Vimeo_woTSA_M/training_state/85000.state
+  resume_state: ~
 
 #### training settings: learning rate scheme, loss
 train:

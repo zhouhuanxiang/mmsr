@@ -1,10 +1,10 @@
 #### general settings
-name: train_EDVR_Vimeo_woTSA_M_test
+name: EDVR_GCB_Vimeo_woTSA_M
 use_tb_logger: true
 model: video_base
 distortion: sr
 scale: 1
-gpu_ids: [4,5,6,7]
+gpu_ids: [0, 1, 2, 3]
 
 #### datasets
 datasets:
@@ -15,7 +15,7 @@ datasets:
     random_reverse: false
     border_mode: false
     dataroot_GT: /home/web_server/zhouhuanxiang/disk/vimeo/vimeo90k_train_GT.lmdb
-    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/vimeo/vimeo90k_train_blocky.lmdb
+    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/vimeo/vimeo90k_train_blocky37.lmdb
     cache_keys: ~
 
     N_frames: 7
@@ -39,6 +39,7 @@ network_G:
   predeblur: false
   HR_in: true
   w_TSA: false
+  w_GCB: True
 
 #### path
 path:
@@ -70,4 +71,4 @@ logger:
   print_freq: 100
   save_checkpoint_freq: !!float 5e3
 
-# python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_EDVR_Vimeo_woTSA_M.yml
+# python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_EDVR_GCB_Vimeo_woTSA_M.yml

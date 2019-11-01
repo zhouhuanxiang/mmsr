@@ -26,14 +26,14 @@ def define_G(opt):
                               groups=opt_net['groups'], front_RBs=opt_net['front_RBs'],
                               back_RBs=opt_net['back_RBs'], center=opt_net['center'],
                               predeblur=opt_net['predeblur'], HR_in=opt_net['HR_in'],
-                              w_TSA=opt_net['w_TSA'])
-    elif which_model == 'EDVR_woDCN':
-        import models.archs.EDVR_woDCN_arch as EDVR_arch
-        netG = EDVR_arch.EDVR(nf=opt_net['nf'], nframes=opt_net['nframes'],
-                              groups=opt_net['groups'], front_RBs=opt_net['front_RBs'],
-                              back_RBs=opt_net['back_RBs'], center=opt_net['center'],
-                              predeblur=opt_net['predeblur'], HR_in=opt_net['HR_in'],
-                              w_TSA=opt_net['w_TSA'])
+                              w_TSA=opt_net['w_TSA'], w_GCB=opt_net['w_GCB'])
+    # elif which_model == 'EDVR_woDCN':
+    #     import models.archs.EDVR_woDCN_arch as EDVR_arch
+    #     netG = EDVR_arch.EDVR(nf=opt_net['nf'], nframes=opt_net['nframes'],
+    #                           groups=opt_net['groups'], front_RBs=opt_net['front_RBs'],
+    #                           back_RBs=opt_net['back_RBs'], center=opt_net['center'],
+    #                           predeblur=opt_net['predeblur'], HR_in=opt_net['HR_in'],
+    #                           w_TSA=opt_net['w_TSA'], w_GCB=opt_net['w_GCB'])
     else:
         raise NotImplementedError('Generator model [{:s}] not recognized'.format(which_model))
 
