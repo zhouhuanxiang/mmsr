@@ -58,3 +58,6 @@ nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes
 nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI40_baseline35.yml > ~/zhouhuanxiang/baseline35 2>&1 &
 nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI40_baseline40.yml > ~/zhouhuanxiang/baseline40 2>&1 &
 nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI40_baseline45.yml > ~/zhouhuanxiang/baseline45 2>&1 &
+
+
+# python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI2530_slim11.yml
