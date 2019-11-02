@@ -4,6 +4,7 @@ tb_logger/*
 datasets/*
 .vscode
 .DS_store
+.idea/*
 
 *.html
 *.png
