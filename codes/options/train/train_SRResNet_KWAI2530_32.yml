@@ -39,6 +39,7 @@ network_G:
   nf: 64
   nb: 16
   upscale: 1
+  use_gpu: true
 
 #### path
 path:

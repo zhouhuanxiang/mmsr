@@ -2,21 +2,21 @@
 # With 16 Residual blocks w/o BN
 
 #### general settings
-name: SRResNet_KWAI2530_baseline
+name: SRResNet_KWAI253035_baseline
 use_tb_logger: true
 model: sr
 distortion: sr
 scale: 1
-gpu_ids: [7]
+gpu_ids: [6]
 
 #### datasets
 datasets:
   train:
     name: KWAI
     mode: LQGT
-    dataroot_GT: /home/web_server/zhouhuanxiang/disk/data/2530/GT
+    dataroot_GT: /home/web_server/zhouhuanxiang/disk/data/253035/GT
     # dataroot_LQ: /home/web_server/zhouhuanxiang/disk/log_prev/log_20190905/EDSR_crf25_baseline/results-KWAIVIDEO-crf25
-    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/data/2530/LQ
+    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/data/253035/LQ
 
     use_shuffle: true
     n_workers: 1  # per GPU
@@ -28,8 +28,8 @@ datasets:
   val:
     name: KWAI-test
     mode: LQGT
-    dataroot_GT: /home/web_server/zhouhuanxiang/disk/data/2530/GT_test
-    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/data/2530/LQ_test
+    dataroot_GT: /home/web_server/zhouhuanxiang/disk/data/253035/GT_test
+    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/data/253035/LQ_test
 
 #### network structures
 network_G:
@@ -72,4 +72,4 @@ logger:
   save_checkpoint_freq: !!float 5e3
 
 
-# python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI2530.yml
+# python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI253035.yml

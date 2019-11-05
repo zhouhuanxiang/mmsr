@@ -64,3 +64,7 @@ nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes
 nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI2530_slim9.yml > ~/zhouhuanxiang/train_SRResNet_KWAI2530_slim9 2>&1 &
 nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI2530_slim10.yml > ~/zhouhuanxiang/train_SRResNet_KWAI2530_slim10 2>&1 &
 nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI2530_slim11.yml > ~/zhouhuanxiang/train_SRResNet_KWAI2530_slim11 2>&1 &
+
+
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI2530.yml > ~/zhouhuanxiang/train_SRResNet_KWAI253035 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI2530_slim7.yml > ~/zhouhuanxiang/train_SRResNet_KWAI253035_slim7 2>&1 &
