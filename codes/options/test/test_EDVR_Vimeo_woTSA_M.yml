@@ -1,4 +1,4 @@
-name: EDVR_GCB_Vimeo_woTSA_M
+name: EDVR_Vimeo_woTSA_M
 suffix: ~  # add suffix to saved images
 model: video_base
 distortion: sr
@@ -36,7 +36,7 @@ network_G:
 
 #### path
 path:
-  pretrain_model_G: /home/web_server/zhouhuanxiang/disk/log/experiments/train_EDVR_GCB_Vimeo_woTSA_M/models/latest_G.pth
+  pretrain_model_G: /home/web_server/zhouhuanxiang/disk/log/experiments/EDVR_Vimeo_woTSA_M/models/latest_G.pth
 
 
-# python ~/zhouhuanxiang/mmsr/codes/test_Viemo_woGT.py -opt ~/zhouhuanxiang/mmsr/codes/options/test/test_EDVR_GCB_Vimeo_woTSA_M.yml
+# python ~/zhouhuanxiang/mmsr/codes/test_Viemo_woGT.py -opt ~/zhouhuanxiang/mmsr/codes/options/test/test_EDVR_Vimeo_woTSA_M.yml
