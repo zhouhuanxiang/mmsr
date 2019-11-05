@@ -1,6 +1,7 @@
 function evaluate()
 %  vimeo_test('/home/web_server/zhouhuanxiang/disk/log/results/EDVR_GCB_Vimeo_woTSA_M/Vimeo', '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences', 'blocky')
-  vimeo_test('/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky37', '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences', 'blocky')
+  vimeo_test('/home/web_server/zhouhuanxiang/disk/log/results/EDVR_Vimeo_woTSA_M/Vimeo', '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences', 'blocky')
+  % vimeo_test('/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky37', '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences', 'blocky')
 end
 
 function result = vimeo_test(output_dir, target_dir, task)
