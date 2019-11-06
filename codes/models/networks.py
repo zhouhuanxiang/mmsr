@@ -38,6 +38,12 @@ def define_G(opt):
     #                           w_TSA=opt_net['w_TSA'], w_GCB=opt_net['w_GCB'])
     elif which_model == 'MGANet':
         netG = Gen_Guided_UNet(input_size=opt_net['input_size'])
+    elif which_model == 'MaskUnet':
+        import repo.CycleGAN.networks as unet_networks
+        netG = unet_networks.define_G(2 * 3, 1, opt_net['nf'], 
+                                      opt_net['G_type'], opt_net['norm'],
+                                      opt_net['dropout'], opt_net['init_type'], 
+                                      opt_net['init_gain'])
     else:
         raise NotImplementedError('Generator model [{:s}] not recognized'.format(which_model))
 
