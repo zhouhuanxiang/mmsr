@@ -40,7 +40,8 @@ class BiConvLSTMCell(nn.Module):
                               bias=self.bias)
 
         # TODO: we may want this to be different than the conv we use inside each cell
-        self.conv_concat = nn.Conv2d(in_channels=self.input_dim + self.hidden_dim,
+        self.conv_concat = nn.Conv2d(in_channels=self.hidden_dim + self.hidden_dim,
+        # self.conv_concat = nn.Conv2d(in_channels=self.input_dim + self.hidden_dim,
                                      out_channels=self.hidden_dim,
                                      kernel_size=self.kernel_size,
                                      padding=self.padding,

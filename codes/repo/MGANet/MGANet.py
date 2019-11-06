@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
 from torch.nn.init import kaiming_normal
-from LSTM.BiConvLSTM import BiConvLSTM
+import repo.MGANet.BiConvLSTM as BiConvLSTM
+from models.base_model import BaseModel
 
 
 def conv(batchNorm, in_planes, out_planes, kernel_size=3, stride=1):
@@ -52,13 +53,13 @@ def crop_like(input, target):
         return input[:, :, :target.size(2), :target.size(3)]
 
 
-class Gen_Guided_UNet(nn.Module):
+class Gen_Guided_UNet(BaseModel):
     expansion = 1
 
-    def __init__(self, batchNorm=True, input_size=[240, 416], is_training=True):
+    def __init__(self, input_size):
         super(Gen_Guided_UNet, self).__init__()
-        self.batchNorm = batchNorm
-        self.is_training = is_training
+        self.input_size = input_size
+        self.batchNorm = False
         self.pre_conv1 = conv(self.batchNorm, 1, 64, kernel_size=3, stride=1)
         self.pre_conv1_1 = conv(self.batchNorm, 64, 64, kernel_size=3, stride=1)
 
@@ -68,13 +69,13 @@ class Gen_Guided_UNet(nn.Module):
         self.pre_conv3 = conv(self.batchNorm, 1, 64, kernel_size=3, stride=1)
         self.pre_conv3_1 = conv(self.batchNorm, 64, 64, kernel_size=3, stride=1)
 
-        self.biconvlstm = BiConvLSTM(input_size=(input_size[0], input_size[1]), input_dim=64, hidden_dim=64,
+        self.biconvlstm = BiConvLSTM(input_size=(self.input_size[0], self.input_size[1]), input_dim=64, hidden_dim=64,
                                      kernel_size=(3, 3), num_layers=1)
 
         self.LSTM_out = conv(self.batchNorm, 128, 64, kernel_size=1, stride=1)
 
-        self.conv1_mask = conv(self.batchNorm, 1, 64, kernel_size=3, stride=1)
-        self.conv2_mask = conv(self.batchNorm, 64, 64, kernel_size=3, stride=1)
+        # self.conv1_mask = conv(self.batchNorm, 1, 64, kernel_size=3, stride=1)
+        # self.conv2_mask = conv(self.batchNorm, 64, 64, kernel_size=3, stride=1)
 
         self.conv1 = conv(self.batchNorm, 64, 128, kernel_size=7, stride=2)  # 64
         self.conv1_1 = conv(self.batchNorm, 128, 128)  # 128*128 ->64*64
@@ -113,7 +114,7 @@ class Gen_Guided_UNet(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-    def forward(self, data1, data2, data3, mask):
+    def forward(self, data1, data2, data3):
 
         CNN_seq = []
         pre_conv1 = self.pre_conv1(data1)
@@ -135,44 +136,49 @@ class Gen_Guided_UNet(nn.Module):
 
         LSTM_out = self.LSTM_out(CNN_concat_input)  # 128*128*64
 
-        conv1_mask = self.conv1_mask(mask)
-        conv2_mask = self.conv2_mask(conv1_mask)  # 128*128*64
+        # conv1_mask = self.conv1_mask(mask)
+        # conv2_mask = self.conv2_mask(conv1_mask)  # 128*128*64
 
         out_conv1 = self.conv1_1(self.conv1(LSTM_out))
         out_conv2 = self.conv2_1(self.conv2(out_conv1))
         out_conv3 = self.conv3_1(self.conv3(out_conv2))
         out_conv4 = self.conv4_1(self.conv4(out_conv3))
 
-        out_conv1_mask = self.conv1_1(self.conv1(conv2_mask))
-        out_conv2_mask = self.conv2_1(self.conv2(out_conv1_mask))
-        out_conv3_mask = self.conv3_1(self.conv3(out_conv2_mask))
-        out_conv4_mask = self.conv4_1(self.conv4(out_conv3_mask))
+        # out_conv1_mask = self.conv1_1(self.conv1(conv2_mask))
+        # out_conv2_mask = self.conv2_1(self.conv2(out_conv1_mask))
+        # out_conv3_mask = self.conv3_1(self.conv3(out_conv2_mask))
+        # out_conv4_mask = self.conv4_1(self.conv4(out_conv3_mask))
 
-        sum4 = out_conv4 + out_conv4_mask
+        # sum4 = out_conv4 + out_conv4_mask
+        sum4 = out_conv4
         image_4 = self.predict_image4(sum4)
         image_4_up = crop_like(self.upsampled_image4_to_3(image_4), out_conv3)
         out_deconv3 = crop_like(self.deconv4(sum4), out_conv3)
 
-        sum3 = out_conv3 + out_conv3_mask
+        # sum3 = out_conv3 + out_conv3_mask
+        sum3 = out_conv3
         concat3 = torch.cat((sum3, out_deconv3, image_4_up), dim=1)
         image_3 = self.predict_image3(concat3)
         image_3_up = crop_like(self.upsampled_image3_to_2(image_3), out_conv2)
         out_deconv2 = crop_like(self.deconv3(concat3), out_conv2)
 
-        sum2 = out_conv2 + out_conv2_mask
+        # sum2 = out_conv2 + out_conv2_mask
+        sum2 = out_conv2
         concat2 = torch.cat((sum2, out_deconv2, image_3_up), dim=1)
         image_2 = self.predict_image2(concat2)
         image_2_up = crop_like(self.upsampled_image2_to_1(image_2), out_conv1)
         out_deconv2 = crop_like(self.deconv2(concat2), out_conv1)
 
-        sum1 = out_conv1 + out_conv1_mask
+        # sum1 = out_conv1 + out_conv1_mask
+        sum1 = out_conv1
         concat1 = torch.cat((sum1, out_deconv2, image_2_up), dim=1)
         image_1 = self.predict_image1(concat1)
         image_1_up = crop_like(self.upsampled_image1_to_finally(image_1), LSTM_out)
         # print(image_1_up.shape)
         out_deconv1 = crop_like(self.deconv1(concat1), LSTM_out)
 
-        sum0 = LSTM_out + conv2_mask
+        # sum0 = LSTM_out + conv2_mask
+        sum0 = LSTM_out
         concat0 = torch.cat([sum0, out_deconv1, image_1_up], dim=1)
         image_out = self.output1(concat0)
         image_out2 = self.output2(image_out)
@@ -181,7 +187,4 @@ class Gen_Guided_UNet(nn.Module):
         image_finally = torch.clamp(image_finally, 0., 1.)
         # print('image_1',image_finally.shape)
 
-        if self.is＿training:
-            return image_4, image_3, image_2, image_1, image_finally
-        else:
-            return image_finally
+        return image_finally

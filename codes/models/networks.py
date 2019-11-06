@@ -7,6 +7,8 @@ import models.archs.RRDBNet_arch as RRDBNet_arch
 # import models.archs.EDVR_arch as EDVR_arch
 import functools
 
+from repo.MGANet.MGANet import Gen_Guided_UNet
+
 # Generator
 def define_G(opt):
     opt_net = opt['network_G']
@@ -34,6 +36,8 @@ def define_G(opt):
     #                           back_RBs=opt_net['back_RBs'], center=opt_net['center'],
     #                           predeblur=opt_net['predeblur'], HR_in=opt_net['HR_in'],
     #                           w_TSA=opt_net['w_TSA'], w_GCB=opt_net['w_GCB'])
+    elif which_model == 'MGANet':
+        netG = Gen_Guided_UNet(input_size=opt_net['input_size'])
     else:
         raise NotImplementedError('Generator model [{:s}] not recognized'.format(which_model))
 
