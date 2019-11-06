@@ -7,9 +7,9 @@ import data.util as util
 class VideoTestDataset(data.Dataset):
     """
     A video test dataset. Support:
-    Vid4
-    REDS4
-    Vimeo90K-Test (x)
+    Vid4 (x)
+    REDS4 (x)
+    Vimeo90K-Test
 
     no need to prepare LMDB files
     """
