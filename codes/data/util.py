@@ -64,6 +64,10 @@ def glob_file_list(root):
     return sorted(glob.glob(os.path.join(root, '*')))
 
 
+def glob_file_in_file_list(root):
+    return sorted(glob.glob(os.path.join(root, '*', '*')))
+
+
 ###################### read images ######################
 def _read_img_lmdb(env, key, size):
     """read image from lmdb with key (w/ and w/o fixed size)
