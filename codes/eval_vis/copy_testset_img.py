@@ -7,10 +7,10 @@ testlist = loadtxt('/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/se
 print(testlist[:10])
 
 for path in testlist:
-    src_path = os.path.join('/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences', path)
-    dst_path = os.path.join('/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_test', path)
-    # src_path = os.path.join('/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky37', path)
-    # dst_path = os.path.join('/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky37_test', path)
+    # src_path = os.path.join('/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences', path)
+    # dst_path = os.path.join('/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_test', path)
+    src_path = os.path.join('/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky42', path)
+    dst_path = os.path.join('/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky42_test', path)
     os.makedirs(dst_path, exist_ok=True)
     os.system('cp -r {}/*.png {}'.format(src_path, dst_path))
     # print(dst_path)

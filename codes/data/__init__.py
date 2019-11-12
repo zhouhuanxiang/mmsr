@@ -45,6 +45,8 @@ def create_dataset(dataset_opt):
         from data.Vimeo90K_test_dataset import VimeoTestDataset as D
     elif mode == 'Vimeo90K_LQ':
         from data.Vimeo90K_LQ_dataset import VimeoLQDataset as D
+    elif mode == 'Vimeo90K_LQ_test':
+        from data.Vimeo90K_LQ_test_dataset import VimeoLQTestDataset as D
     else:
         raise NotImplementedError('Dataset [{:s}] is not recognized.'.format(mode))
     dataset = D(dataset_opt)

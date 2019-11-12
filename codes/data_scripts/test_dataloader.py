@@ -116,9 +116,9 @@ def main():
         opt['data_type'] = 'img'  # img | lmdb | mc
     elif dataset == 'Vimeo90K_LQ':
         opt['name'] = 'Vimeo90K-LQ'
-        opt['dataroot_LQ0'] = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky32'
-        opt['dataroot_LQ1'] = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky37'
-        opt['dataroot_LQ2'] = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky42'
+        opt['dataroot_LHQ'] = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky32'
+        opt['dataroot_LQ'] = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky37'
+        opt['dataroot_LLQ'] = '/home/web_server/zhouhuanxiang/disk/vimeo/vimeo_septuplet/sequences_blocky42'
         opt['mode'] = 'Vimeo90K_LQ'
         opt['patch_size'] = 32
         opt['patch_repeat'] = 5
@@ -168,24 +168,27 @@ def main():
         print(i)
 
 
-        LQ0s = data['LQ0s']
-        LQ1s = data['LQ1s']
-        LQ2s = data['LQ2s']
+        LQs = data['LQs']
+        # LLQs = data['LLQs']
+        # LHQs = data['LHQs']
+        patch_labels = data['patch_labels']
         patch_offsets = data['patch_offsets']
-        print(patch_offsets)
+        print(patch_labels.shape)
+        print(patch_offsets.shape)
+        print(LQs.shape)
 
-        for j in range(LQ0s.size(1)):
-            torchvision.utils.save_image(LQ0s[:, j, :, :, :],
-                                         '/home/web_server/zhouhuanxiang/tmp/LQ0_{:03d}_{}.png'.format(i, j), nrow=nrow,
+        for j in range(LQs.size(1)):
+            torchvision.utils.save_image(LQs[:, j, :, :, :],
+                                         '/home/web_server/zhouhuanxiang/tmp/LQ_{:03d}_{}.png'.format(i, j), nrow=nrow,
                                          padding=padding, normalize=False)
-        for j in range(LQ1s.size(1)):
-            torchvision.utils.save_image(LQ1s[:, j, :, :, :],
-                                         '/home/web_server/zhouhuanxiang/tmp/LQ1_{:03d}_{}.png'.format(i, j), nrow=nrow,
-                                         padding=padding, normalize=False)
-        for j in range(LQ2s.size(1)):
-            torchvision.utils.save_image(LQ2s[:, j, :, :, :],
-                                         '/home/web_server/zhouhuanxiang/tmp/LQ2_{:03d}_{}.png'.format(i, j), nrow=nrow,
-                                         padding=padding, normalize=False)
+        # for j in range(LLQs.size(1)):
+        #     torchvision.utils.save_image(LLQs[:, j, :, :, :],
+        #                                  '/home/web_server/zhouhuanxiang/tmp/LLQ_{:03d}_{}.png'.format(i, j), nrow=nrow,
+        #                                  padding=padding, normalize=False)
+        # for j in range(LHQs.size(1)):
+        #     torchvision.utils.save_image(LHQs[:, j, :, :, :],
+        #                                  '/home/web_server/zhouhuanxiang/tmp/LHQ_{:03d}_{}.png'.format(i, j), nrow=nrow,
+        #                                  padding=padding, normalize=False)
 
     # for i, data in enumerate(train_loader):
     #     if i > 5:
