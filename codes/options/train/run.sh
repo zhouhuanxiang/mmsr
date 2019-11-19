@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRGAN_KWAI35.yml > ~/zhouhuanxiang/gan35 2>&1 &
 nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRGAN_KWAI40.yml > ~/zhouhuanxiang/gan40 2>&1 &
 nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRGAN_KWAI45.yml > ~/zhouhuanxiang/gan45 2>&1 &
@@ -66,5 +67,32 @@ nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes
 nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI2530_slim11.yml > ~/zhouhuanxiang/train_SRResNet_KWAI2530_slim11 2>&1 &
 
 
-nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI2530.yml > ~/zhouhuanxiang/train_SRResNet_KWAI253035 2>&1 &
-nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI2530_slim7.yml > ~/zhouhuanxiang/train_SRResNet_KWAI253035_slim7 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI253035.yml > ~/zhouhuanxiang/train_SRResNet_KWAI253035 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI253035_slim7.yml > ~/zhouhuanxiang/train_SRResNet_KWAI253035_slim7 2>&1 &
+
+
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_UNet_attention_u256_wDiff.yml >  ~/zhouhuanxiang/train_UNet_attention_u256_wDiff 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_UNet_attention_u256_woDiff.yml >  ~/zhouhuanxiang/train_UNet_attention_u256_woDiff 2>&1 &
+
+
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/ssim/train_SRResNet_ssim_KWAI2530.yml > ~/zhouhuanxiang/train_SRResNet_ssim_KWAI2530 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/ssim/train_SRResNet_ms_ssim_KWAI2530.yml > ~/zhouhuanxiang/train_SRResNet_ms_ssim_KWAI2530 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/ssim/train_SRResNet_ssim_KWAI253035.yml > ~/zhouhuanxiang/train_SRResNet_ssim_KWAI253035 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/ssim/train_SRResNet_ms_ssim_KWAI253035.yml > ~/zhouhuanxiang/train_SRResNet_ms_ssim_KWAI253035 2>&1 &
+
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/ssim/train_SRResNet_ssim_KWAI2530_slim7.yml > ~/zhouhuanxiang/train_SRResNet_ssim_KWAI2530_slim7 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/ssim/train_SRResNet_ms_ssim_KWAI2530_slim7.yml > ~/zhouhuanxiang/train_SRResNet_ms_ssim_KWAI2530_slim7 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/ssim/train_SRResNet_ssim_KWAI253035_slim7.yml > ~/zhouhuanxiang/train_SRResNet_ssim_KWAI253035_slim7 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/ssim/train_SRResNet_ms_ssim_KWAI253035_slim7.yml > ~/zhouhuanxiang/train_SRResNet_ms_ssim_KWAI253035_slim7 2>&1 &
+
+
+
+nohup python ~/zhouhuanxiang/mmsr/codes/test.py -opt ~/zhouhuanxiang/mmsr/codes/options/test/ssim/test_SRResNet_ssim_KWAI2530.yml > ~/zhouhuanxiang/test_SRResNet_ssim_KWAI2530 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/test.py -opt ~/zhouhuanxiang/mmsr/codes/options/test/ssim/test_SRResNet_ms_ssim_KWAI2530.yml > ~/zhouhuanxiang/test_SRResNet_ms_ssim_KWAI2530 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/test.py -opt ~/zhouhuanxiang/mmsr/codes/options/test/ssim/test_SRResNet_ssim_KWAI253035.yml > ~/zhouhuanxiang/test_SRResNet_ssim_KWAI253035 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/test.py -opt ~/zhouhuanxiang/mmsr/codes/options/test/ssim/test_SRResNet_ms_ssim_KWAI253035.yml > ~/zhouhuanxiang/test_SRResNet_ms_ssim_KWAI253035 2>&1 &
+
+nohup python ~/zhouhuanxiang/mmsr/codes/test.py -opt ~/zhouhuanxiang/mmsr/codes/options/test/ssim/test_SRResNet_ssim_KWAI2530_slim7.yml > ~/zhouhuanxiang/test_SRResNet_ssim_KWAI2530_slim7 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/test.py -opt ~/zhouhuanxiang/mmsr/codes/options/test/ssim/test_SRResNet_ms_ssim_KWAI2530_slim7.yml > ~/zhouhuanxiang/test_SRResNet_ms_ssim_KWAI2530_slim7 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/test.py -opt ~/zhouhuanxiang/mmsr/codes/options/test/ssim/test_SRResNet_ssim_KWAI253035_slim7.yml > ~/zhouhuanxiang/test_SRResNet_ssim_KWAI253035_slim7 2>&1 &
+nohup python ~/zhouhuanxiang/mmsr/codes/test.py -opt ~/zhouhuanxiang/mmsr/codes/options/test/ssim/test_SRResNet_ms_ssim_KWAI253035_slim7.yml > ~/zhouhuanxiang/test_SRResNet_ms_ssim_KWAI253035_slim7 2>&1 &

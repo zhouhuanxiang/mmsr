@@ -8,6 +8,7 @@ import models.networks as networks
 import models.lr_scheduler as lr_scheduler
 from .base_model import BaseModel
 from models.loss import CharbonnierLoss, ContextualLoss
+from pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
 
 logger = logging.getLogger('base')
 
@@ -22,6 +23,7 @@ class SRModel(BaseModel):
             self.rank = -1  # non dist training
         train_opt = opt['train']
         self.use_gpu = opt['network_G']['use_gpu']
+        self.use_gpu = True
 
         # define network and load pretrained models
         if self.use_gpu:
@@ -63,6 +65,15 @@ class SRModel(BaseModel):
             else:
                 logger.info('Remove CX loss.')
                 self.cri_CX = None
+
+            # ssim loss
+            if train_opt['ssim_weight']:
+                self.cri_ssim = train_opt['ssim_criterion']
+                self.l_ssim_w = train_opt['ssim_weight']
+            else:
+                logger.info('Remove ssim loss.')
+                self.cri_ssim = None
+
 
             # load VGG perceptual loss if use CX loss
             if train_opt['CX_weight']:
@@ -126,6 +137,15 @@ class SRModel(BaseModel):
             fake_fea = self.netF(self.fake_H)
             l_CX = self.l_CX_w * self.cri_CX(real_fea, fake_fea)
             l_g_total += l_CX
+        if self.cri_ssim:
+            if self.cri_ssim == 'ssim':
+                ssim_val = ssim(self.fake_H, self.real_H, data_range=1.0, size_average=True)
+            elif self.cri_ssim == 'ms-ssim':
+                weights = torch.FloatTensor([0.0448, 0.2856, 0.3001, 0.2363]).to(self.fake_H.device, dtype=self.fake_H.dtype)
+                ssim_val = ms_ssim(self.fake_H, self.real_H, data_range=1.0, size_average=True, weights=weights)
+            l_ssim = self.l_ssim_w * (1 - ssim_val)
+            l_g_total += l_ssim
+
         l_g_total.backward()
         self.optimizer_G.step()
 
@@ -133,6 +153,8 @@ class SRModel(BaseModel):
         self.log_dict['l_pix'] = l_pix.item()
         if self.cri_CX:
             self.log_dict['l_CX'] = l_CX.item()
+        if self.cri_ssim:
+            self.log_dict['l_ssim'] = l_ssim.item()
 
     def test(self):
         self.netG.eval()
