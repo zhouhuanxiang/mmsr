@@ -77,6 +77,7 @@ for test_loader in test_loaders:
         else:
             os.makedirs(os.path.join(dataset_dir, video_name), exist_ok=True)
             save_img_path = osp.join(dataset_dir, video_name, img_name + '.png')
+        print(save_img_path)
         util.save_img(sr_img, save_img_path)
 
         # calculate PSNR and SSIM

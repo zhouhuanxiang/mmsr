@@ -7,7 +7,7 @@ use_tb_logger: true
 model: sr
 distortion: sr
 scale: 1
-gpu_ids: [3]
+gpu_ids: [7]
 
 #### datasets
 datasets:

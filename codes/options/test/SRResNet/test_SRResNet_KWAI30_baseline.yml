@@ -1,17 +1,17 @@
-name: test_SRResNet_example
+name: test_SRResNet_KWAI30_baseline
 suffix: ~  # add suffix to saved images
 model: sr
 distortion: sr
 scale: 1
 crop_border: ~  # crop border when evaluation. If None(~), crop the scale pixels
-gpu_ids: [0]
+gpu_ids: [6]
 
 datasets:
   test_1:  # the 1st test dataset
     name: KWAI-test
     mode: LQ
-    # dataroot_GT: /home/web_server/zhouhuanxiang/disk/data/HD_UGC_crf40_raw_test
-    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/data/HD_UGC_crf40_raw_test
+    # dataroot_GT: /home/web_server/zhouhuanxiang/disk/data/HD_UGC_crf30_raw_test
+    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/data/HD_UGC_crf30_raw_test
 
 #### network structures
 network_G:
@@ -25,9 +25,9 @@ network_G:
 
 #### path
 path:
-  pretrain_model_G: /home/web_server/zhouhuanxiang/disk/log/experiments/SRResNet_KWAI40_baseline/models/latest_G.pth
+  pretrain_model_G: /home/web_server/zhouhuanxiang/disk/log/experiments/SRResNet_KWAI30_baseline/models/latest_G.pth
   # root: '/media/disk1/fordata/web_server/zhouhuanxiang/log'
   root: '/home/web_server/zhouhuanxiang/disk/log'
 
-# python ~/zhouhuanxiang/mmsr/codes/test.py -opt ~/zhouhuanxiang/mmsr/codes/options/test/test_SRResNet_example.yml
+# python ~/zhouhuanxiang/mmsr/codes/test.py -opt ~/zhouhuanxiang/mmsr/codes/options/test/SRResNet/test_SRResNet_KWAI30_basline.yml
  

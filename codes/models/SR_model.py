@@ -70,6 +70,7 @@ class SRModel(BaseModel):
             if train_opt['ssim_weight']:
                 self.cri_ssim = train_opt['ssim_criterion']
                 self.l_ssim_w = train_opt['ssim_weight']
+                self.ssim_window = train_opt['ssim_window']
             else:
                 logger.info('Remove ssim loss.')
                 self.cri_ssim = None
@@ -139,10 +140,10 @@ class SRModel(BaseModel):
             l_g_total += l_CX
         if self.cri_ssim:
             if self.cri_ssim == 'ssim':
-                ssim_val = ssim(self.fake_H, self.real_H, data_range=1.0, size_average=True)
+                ssim_val = ssim(self.fake_H, self.real_H, win_size=self.ssim_window, data_range=1.0, size_average=True)
             elif self.cri_ssim == 'ms-ssim':
                 weights = torch.FloatTensor([0.0448, 0.2856, 0.3001, 0.2363]).to(self.fake_H.device, dtype=self.fake_H.dtype)
-                ssim_val = ms_ssim(self.fake_H, self.real_H, data_range=1.0, size_average=True, weights=weights)
+                ssim_val = ms_ssim(self.fake_H, self.real_H, win_size=self.ssim_window, data_range=1.0, size_average=True, weights=weights)
             l_ssim = self.l_ssim_w * (1 - ssim_val)
             l_g_total += l_ssim
 
