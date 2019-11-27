@@ -92,7 +92,7 @@ class VideoBaseModel(BaseModel):
             self.optimizer_G = torch.optim.Adam(optim_params, lr=train_opt['lr_G'],
                                                 weight_decay=wd_G,
                                                 betas=(train_opt['beta1'], train_opt['beta2']))
-            self.optimizer_G_dcn = torch.optim.Adam(optim_params, lr=train_opt['lr_G'] * 0.1,
+            self.optimizer_G_dcn = torch.optim.Adam(dcn_params, lr=train_opt['lr_G'] * 0.1,
                                                 weight_decay=wd_G,
                                                 betas=(train_opt['beta1'], train_opt['beta2']))
             self.optimizers.append(self.optimizer_G)
@@ -126,6 +126,8 @@ class VideoBaseModel(BaseModel):
     def set_params_lr_zero(self):
         # fix normal module
         self.optimizers[0].param_groups[0]['lr'] = 0
+        # fix dcn module
+        self.optimizers[1].param_groups['lr'] = 0
 
     def optimize_parameters(self, step):
         if self.opt['train']['ft_tsa_only'] and step < self.opt['train']['ft_tsa_only']:

@@ -4,6 +4,7 @@ import models.archs.SRResNet_arch as SRResNet_arch
 import models.archs.discriminator_vgg_arch as SRGAN_arch
 import models.archs.discriminator_patch_arch as SRGAN_patch_arch
 import models.archs.RRDBNet_arch as RRDBNet_arch
+import models.archs.ProxIQANet_arch as ProxIQANet_arch
 # import models.archs.EDVR_arch as EDVR_arch
 import functools
 
@@ -44,6 +45,7 @@ def define_G(opt):
                                       opt_net['G_type'], opt_net['norm'],
                                       opt_net['dropout'], opt_net['init_type'], 
                                       opt_net['init_gain'])
+
     else:
         raise NotImplementedError('Generator model [{:s}] not recognized'.format(which_model))
 
@@ -100,3 +102,11 @@ def define_F(opt, use_bn=False):
                                           use_input_norm=True, device=device)
     netF.eval()  # No need to train
     return netF
+
+def define_I(opt):
+    opt_net = opt['network_I']
+    which_model = opt_net['which_model_I']
+
+    net_I= ProxIQANet_arch.ProxIQANet()
+
+    return net_I
