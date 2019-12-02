@@ -7,6 +7,8 @@ import glob
 import torch
 import cv2
 import glob
+import utils.util as util
+import re
 
 ####################
 # Files & IO
@@ -528,6 +530,73 @@ def imresize_np(img, scale, antialiasing=True):
 
     return out_2.numpy()
 
+
+def run_vmaf(img_LQ, img_GT, filename):
+    # 0) get process pid
+    pid = os.getpid()
+    filename = str(pid) + '_' + filename
+    # 1) save image as .png
+    util.save_img(img_LQ * 255.0, '/home/web_server/zhouhuanxiang/disk/tmp/{}_LQ.png'.format(filename))
+    util.save_img(img_GT * 255.0, '/home/web_server/zhouhuanxiang/disk/tmp/{}_GT.png'.format(filename))
+    # 2) run ffmpeg with vmaf filter to get the vmaf score
+    output = os.popen('ffmpeg '\
+                      '-i /home/web_server/zhouhuanxiang/disk/tmp/{}_LQ.png '\
+                      '-i /home/web_server/zhouhuanxiang/disk/tmp/{}_GT.png '\
+                      '-lavfi '\
+                      'libvmaf="model_path=/home/web_server/zhouhuanxiang/disk/vmaf/model/vmaf_v0.6.1.pkl"'\
+                      ' -hide_banner -f null - 2>&1'.format(filename, filename)).read()
+    vmaf = (re.compile("score: (\d+.\d+)").findall(output))[0]
+    vmaf = float(vmaf) / 100.0
+
+    os.system('rm /home/web_server/zhouhuanxiang/disk/tmp/{}_LQ.png '\
+              '/home/web_server/zhouhuanxiang/disk/tmp/{}_GT.png'.format(filename, filename))
+
+    return vmaf
+
+    # B, C, H, W = self.real_H.shape
+    #
+    # vmafs = torch.zeros(B, 1).to(self.device)
+    # os.makedirs('/home/web_server/zhouhuanxiang/disk/tmp', exist_ok=True)
+    #
+    # for i in range(B):
+    #     # 1) save the image as .png
+    #     var_L_i = self.var_L[i].detach().float().cpu()
+    #     real_H_i = self.real_H[i].detach().float().cpu()
+    #     img_L_i = util.tensor2img(var_L_i)
+    #     img_H_i = util.tensor2img(real_H_i)
+    #     util.save_img(img_L_i, '/home/web_server/zhouhuanxiang/disk/tmp/LQ{}.png'.format(i))
+    #     util.save_img(img_H_i, '/home/web_server/zhouhuanxiang/disk/tmp/HQ{}.png'.format(i))
+    #     # 2) run ffmpeg with vmaf filter to get the vmaf score
+    #     output = os.popen('ffmpeg '\
+    #                       '-i /home/web_server/zhouhuanxiang/disk/tmp/LQ{}.png '\
+    #                       '-i /home/web_server/zhouhuanxiang/disk/tmp/HQ{}.png '\
+    #                       '-lavfi '\
+    #                       'libvmaf="model_path=/home/web_server/zhouhuanxiang/disk/vmaf/model/vmaf_v0.6.1.pkl"'\
+    #                       ' -hide_banner -f null - 2>&1'.format(i, i)).read()
+    #     vmaf = (re.compile("score: (\d+.\d+)").findall(output))[0]
+    #     vmafs[i, 0] = float(vmaf)
+
+        # # 2) convert .png to .yuv use ffmpeg
+        # os.system('ffmpeg -i /home/web_server/zhouhuanxiang/disk/tmp/LQ{}.png '\
+        #           '-f rawvideo -pix_fmt yuv420p -y -hide_banner -loglevel panic '\
+        #           '/home/web_server/zhouhuanxiang/disk/tmp/LQ{}.yuv'.format(i, i))
+        # os.system('ffmpeg -i /home/web_server/zhouhuanxiang/disk/tmp/HQ{}.png ' \
+        #           '-f rawvideo -pix_fmt yuv420p -y -hide_banner -loglevel panic ' \
+        #           '/home/web_server/zhouhuanxiang/disk/tmp/HQ{}.yuv'.format(i, i))
+        # # 3) run vmafossexec to get the vmaf score
+        # os.system('vmafossexec yuv420p {} {} '\
+        #           '/home/web_server/zhouhuanxiang/disk/tmp/HQ{}.yuv '\
+        #           '/home/web_server/zhouhuanxiang/disk/tmp/LQ{}.yuv '\
+        #           '/home/web_server/zhouhuanxiang/disk/vmaf/model/vmaf_v0.6.1.pkl '\
+        #           '--log /home/web_server/zhouhuanxiang/disk/tmp/vmaf{}.xml'.format(H, W, i, i, i))
+        # # 4) read vmaf socre from xml
+        # xml_i = minidom.parse('/home/web_server/zhouhuanxiang/disk/tmp/vmaf{}.xml'.format(i))
+        # item = xml_i.getElementsByTagName('frame')[0]
+        # vmafs[i, 0] = float(item.attributes['vmaf'].value) / 100.0
+
+
+    # print(vmafs)
+    return vmafs
 
 if __name__ == '__main__':
     # test imresize function
