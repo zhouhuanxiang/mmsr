@@ -63,41 +63,6 @@ class XiphDataset(data.Dataset):
             self.sample_list += int(value['length'] / 50) * repeat * [str(key)]
 
 
-    def read_yuv_frames(self, video_path, video_name, dims, startfrm, numfrm, rnd_h, rnd_w, patch_size):
-        fp = open(os.path.join(video_path, video_name+'.yuv'), 'rb')
-        blk_size = np.prod(dims) * 3 / 2
-        fp.seek(np.int(blk_size * startfrm), 0)
-        d00 = dims[0] // 2
-        d01 = dims[1] // 2
-
-        imgs = []
-        for i in range(numfrm):
-            # Y channel
-            y = fp.read(dims[0] * dims[1])
-            y = np.frombuffer(y, dtype=np.uint8)
-            y = y.reshape(dims)
-            y = y[rnd_h:rnd_h + patch_size, rnd_w:rnd_w + patch_size]
-            # U channel
-            u = fp.read(d00 * d01)
-            u = np.frombuffer(u, dtype=np.uint8)
-            u = u.reshape(d00, d01)
-            u = u[rnd_h // 2:(rnd_h + patch_size) // 2, rnd_w // 2:(rnd_w + patch_size) // 2]
-            # V channel
-            v = fp.read(d00 * d01)
-            v = np.frombuffer(v, dtype=np.uint8)
-            v = v.reshape(d00, d01)
-            v = v[rnd_h // 2:(rnd_h + patch_size) // 2, rnd_w // 2:(rnd_w + patch_size) // 2]
-            # scale UV channel
-            enlarge_u = cv2.resize(u, (0, 0), fx=2.0, fy=2.0, interpolation=cv2.INTER_CUBIC)
-            enlarge_v = cv2.resize(v, (0, 0), fx=2.0, fy=2.0, interpolation=cv2.INTER_CUBIC)
-            # to YUV channels to BGR channels
-            img_yuv = cv2.merge([y, enlarge_u, enlarge_v])
-            img_rgb = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR) / 255.0
-            imgs.append(img_rgb)
-        fp.close()
-        return imgs
-
-
     def __getitem__(self, index):
         index = index % len(self.sample_list)
 
@@ -138,18 +103,17 @@ class XiphDataset(data.Dataset):
             if self.random_reverse and random.random() < 0.5:
                 neighbor_list.reverse()
 
-        assert len(neighbor_list) == self.opt['N_frames'], 
-            'Wrong length of neighbor list: {}'.format(len(neighbor_list))
+        assert len(neighbor_list) == self.opt['N_frames'], 'Wrong length of neighbor list: {}'.format(len(neighbor_list))
 
         rnd_h = random.randint(0, max(0, video_height - GT_size)) // 2 * 2
         rnd_w = random.randint(0, max(0, video_width - GT_size)) // 2 * 2
         #### get the GT image (as the center frame)
-        img_GT = self.read_yuv_frames(self.GT_root, video_name,
+        img_GT = util.read_yuv_frames(self.GT_root, video_name,
                                       (video_height, video_width),
                                       center_frame_idx, 1,
                                       rnd_h, rnd_w, GT_size)[0]
         #### get LQ images
-        img_LQ_l = self.read_yuv_frames(self.LQ_root, video_name,
+        img_LQ_l = util.read_yuv_frames(self.LQ_root, video_name,
                                         (video_height, video_width),
                                         center_frame_idx - self.half_N_frames * interval,
                                         N_frames,

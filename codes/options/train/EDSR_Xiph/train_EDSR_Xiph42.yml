@@ -17,17 +17,17 @@ datasets:
     interval_list: [1]
     random_reverse: false
     border_mode: false
-    dataroot_GT: /home/web_server/zhouhuanxiang/disk/Xiph/Xiph_all_encoded_42
-    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/Xiph/Xiph
-    metainfo_path: /home/web_server/zhouhuanxiang/mmsr/codes/data_scripts/y4m_metainfos_256.json
+    dataroot_GT: /home/web_server/zhouhuanxiang/disk/Xiph/Xiph
+    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/Xiph/Xiph_all_encoded_42
+    metainfo_path: /home/web_server/zhouhuanxiang/mmsr/codes/data_scripts/y4m_metainfos_128.json
     cache_keys: ~
 
     N_frames: 1
     use_shuffle: true
-    n_workers: 2  # per GPU
-    batch_size: 8
-    GT_size: 256
-    LQ_size: 256
+    n_workers: 1  # per GPU
+    batch_size: 16
+    GT_size: 128
+    LQ_size: 128
     use_flip: true
     use_rot: true
     color: RGB

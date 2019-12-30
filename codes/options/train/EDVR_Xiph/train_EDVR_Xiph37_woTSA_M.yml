@@ -14,14 +14,14 @@ datasets:
     interval_list: [1]
     random_reverse: false
     border_mode: false
-    dataroot_GT: /home/web_server/zhouhuanxiang/disk/Xiph/Xiph_all_encoded_37
-    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/Xiph/Xiph
+    dataroot_GT: /home/web_server/zhouhuanxiang/disk/Xiph/Xiph
+    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/Xiph/Xiph_all_encoded_37
     metainfo_path: /home/web_server/zhouhuanxiang/mmsr/codes/data_scripts/y4m_metainfos_128.json
     cache_keys: ~
 
     N_frames: 5
     use_shuffle: true
-    n_workers: 2  # per GPU
+    n_workers: 1  # per GPU
     batch_size: 32
     GT_size: 128
     LQ_size: 128

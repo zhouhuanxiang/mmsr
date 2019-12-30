@@ -2,7 +2,7 @@
 # With 16 Residual blocks w/o BN
 
 #### general settings
-name: train_EBR2_Xiph42
+name: train_EBRN1_Xiph42
 use_tb_logger: true
 model: sr
 distortion: sr
@@ -17,14 +17,14 @@ datasets:
     interval_list: [1]
     random_reverse: false
     border_mode: false
-    dataroot_GT: /home/web_server/zhouhuanxiang/disk/Xiph/Xiph_all_encoded_42
-    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/Xiph/Xiph
+    dataroot_GT: /home/web_server/zhouhuanxiang/disk/Xiph/Xiph
+    dataroot_LQ: /home/web_server/zhouhuanxiang/disk/Xiph/Xiph_all_encoded_37
     metainfo_path: /home/web_server/zhouhuanxiang/mmsr/codes/data_scripts/y4m_metainfos_128.json
     cache_keys: ~
 
     N_frames: 1
     use_shuffle: true
-    n_workers: 2  # per GPU
+    n_workers: 1  # per GPU
     batch_size: 16
     GT_size: 128
     LQ_size: 128
@@ -34,7 +34,7 @@ datasets:
 
 #### network structures
 network_G:
-  which_model_G: EBRN2
+  which_model_G: EBRN1
   # in_nc: 3
   # out_nc: 3
   # nf: 64
