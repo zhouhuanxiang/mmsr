@@ -54,5 +54,9 @@ class MSRResNet(nn.Module):
 
         out = self.conv_last(self.lrelu(self.HRconv(out)))
         base = F.interpolate(x, scale_factor=self.upscale, mode='bilinear', align_corners=False)
-        out += base
+
+        if out.shape[1] == base.shape[1]:
+            out += base
+        else:
+            out += base[:, :3, :, :]
         return out
