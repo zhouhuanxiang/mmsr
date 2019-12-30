@@ -2,12 +2,12 @@
 # With 16 Residual blocks w/o BN
 
 #### general settings
-name: train_SRResNet_ssim_KWAI35_21
+name: train_SRResNet_ssim_KWAI35_11
 use_tb_logger: true
 model: sr
 distortion: sr
 scale: 1
-gpu_ids: [5]
+gpu_ids: [1]
 
 #### datasets
 datasets:
@@ -75,5 +75,6 @@ logger:
   print_freq: 100
   save_checkpoint_freq: !!float 5e3
 
+# nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/ssim/train_SRResNet_ssim_KWAI35_11.yml > ~/zhouhuanxiang/train_SRResNet_ssim_KWAI35_11 2>&1 &
+# nohup python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/ssim/train_SRResNet_ssim_KWAI35_21.yml > ~/zhouhuanxiang/train_SRResNet_ssim_KWAI35_21 2>&1 &
 
-# python ~/zhouhuanxiang/mmsr/codes/train.py -opt ~/zhouhuanxiang/mmsr/codes/options/train/train_SRResNet_KWAI253035.yml
