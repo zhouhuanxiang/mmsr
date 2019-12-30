@@ -1,6 +1,8 @@
 import logging
 from collections import OrderedDict
 
+import os
+import re
 import torch
 import torch.nn as nn
 from torch.nn.parallel import DataParallel, DistributedDataParallel
@@ -9,6 +11,11 @@ import models.lr_scheduler as lr_scheduler
 from .base_model import BaseModel
 from models.loss import CharbonnierLoss, ContextualLoss
 from pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
+import utils.util as util
+from data.util import run_vmaf_pytorch, run_vmaf_pytorch_parallel
+from xml.dom import minidom
+import multiprocessing
+import time
 
 logger = logging.getLogger('base')
 
@@ -24,6 +31,7 @@ class SRVmafModel(BaseModel):
         train_opt = opt['train']
         self.use_gpu = opt['network_G']['use_gpu']
         self.use_gpu = True
+        self.real_IQA_only = train_opt['IQA_only']
 
         # define network and load pretrained models
         if self.use_gpu:
@@ -34,6 +42,21 @@ class SRVmafModel(BaseModel):
                 self.netG = DataParallel(self.netG)
         else:
             self.netG = networks.define_G(opt)
+
+        if self.is_train:
+            if train_opt['IQA_weight']:
+                if train_opt['IQA_criterion'] == 'vmaf':
+                    self.cri_IQA = nn.MSELoss()
+                self.l_IQA_w = train_opt['IQA_weight']
+
+                self.netI = networks.define_I(opt)
+                if opt['dist']:
+                    pass
+                else:
+                    self.netI = DataParallel(self.netI)
+            else:
+                logger.info('Remove IQA loss.')
+                self.cri_IQA = None
 
         # print network
         self.print_network()
@@ -84,20 +107,6 @@ class SRVmafModel(BaseModel):
             #     else:
             #         self.netF = DataParallel(self.netF)
 
-            if train_opt['IQA_weight']:
-                l_IQA_type = train_opt['IQA_criterion']
-                if l_IQA_type == 'vmaf_loss':
-                    self.cri_IQA = nn.CrossEntropyLoss().to(self.device)
-                else:
-                    raise NotImplementedError('Loss type [{:s}] not recognized.'.format(l_CX_type))
-                self.l_IQA_w = train_opt['IQA_weight']
-
-                self.netI = networks.define_I(opt)
-                if opt['dist']:
-                    pass
-                else:
-                    self.netI = DataParallel(self.netI)
-
             # optimizers of netG
             wd_G = train_opt['weight_decay_G'] if train_opt['weight_decay_G'] else 0
             optim_params = []
@@ -146,49 +155,94 @@ class SRVmafModel(BaseModel):
                 raise NotImplementedError('MultiStepLR learning rate scheme is enough.')
 
             self.log_dict = OrderedDict()
+            self.set_requires_grad(self.netG, False)
+            self.set_requires_grad(self.netI, False)
 
     def feed_data(self, data, need_GT=True):
         if self.use_gpu:
             self.var_L = data['LQ'].to(self.device)  # LQ
             if need_GT:
                 self.real_H = data['GT'].to(self.device)  # GT
+            if self.cri_IQA and ('IQA' in data.keys()):
+                self.real_IQA = data['IQA'].float().to(self.device) # IQA
         else:
             self.var_L = data['LQ']  # LQ
 
     def optimize_parameters(self, step):
-        # optimize netI
-        if self.cri_IQA:
+        #init loss
+        l_pix = torch.zeros(1)
+        l_CX = torch.zeros(1)
+        l_ssim = torch.zeros(1)
+        l_g_IQA = torch.zeros(1)
+        l_i_IQA = torch.zeros(1)
+
+        if self.cri_IQA and self.real_IQA_only:
+            # pretrain netI
+            self.set_requires_grad(self.netI, True)
             self.optimizer_I.zero_grad()
-            
 
+            iqa = self.netI(self.var_L, self.real_H).squeeze()
+            l_i_IQA = self.l_IQA_w * self.cri_IQA(iqa, self.real_IQA)
+            l_i_IQA.backward()
 
-        # optimize netG
-        self.optimizer_G.zero_grad()
-        self.fake_H = self.netG(self.var_L)
+            self.optimizer_I.step()
+        elif self.cri_IQA and not self.real_IQA_only:
+            # train netG and netI together
 
-        l_g_total = 0
-        l_pix = self.l_pix_w * self.cri_pix(self.fake_H, self.real_H)
-        l_g_total += l_pix
-        if self.cri_CX:
-            real_fea = self.netF(self.real_H)
-            fake_fea = self.netF(self.fake_H)
-            l_CX = self.l_CX_w * self.cri_CX(real_fea, fake_fea)
-            l_g_total += l_CX
-        if self.cri_ssim:
-            if self.cri_ssim == 'ssim':
-                ssim_val = ssim(self.fake_H, self.real_H, win_size=self.ssim_window, data_range=1.0, size_average=True)
-            elif self.cri_ssim == 'ms-ssim':
-                weights = torch.FloatTensor([0.0448, 0.2856, 0.3001, 0.2363]).to(self.fake_H.device, dtype=self.fake_H.dtype)
-                ssim_val = ms_ssim(self.fake_H, self.real_H, win_size=self.ssim_window, data_range=1.0, size_average=True, weights=weights)
-            l_ssim = self.l_ssim_w * (1 - ssim_val)
-            l_g_total += l_ssim
-        if self.cri_IQA:
-            fake_score = self.netI(self.fake_H, self.real_H)
-            l_IQA = self.l_IQA_w * self.cri_IQA(fake_score)
-            l_g_total += l_IQA
+            # optimize netG
+            self.set_requires_grad(self.netG, True)
+            self.optimizer_G.zero_grad()
 
-        l_g_total.backward()
-        self.optimizer_G.step()
+            # forward
+            self.fake_H = self.netG(self.var_L)
+
+            l_g_total = 0
+            l_pix = self.l_pix_w * self.cri_pix(self.fake_H, self.real_H)
+            l_g_total += l_pix
+            if self.cri_CX:
+                real_fea = self.netF(self.real_H)
+                fake_fea = self.netF(self.fake_H)
+                l_CX = self.l_CX_w * self.cri_CX(real_fea, fake_fea)
+                l_g_total += l_CX
+            if self.cri_ssim:
+                if self.cri_ssim == 'ssim':
+                    ssim_val = ssim(self.fake_H, self.real_H, win_size=self.ssim_window, data_range=1.0, size_average=True)
+                elif self.cri_ssim == 'ms-ssim':
+                    weights = torch.FloatTensor([0.0448, 0.2856, 0.3001, 0.2363]).to(self.fake_H.device, dtype=self.fake_H.dtype)
+                    ssim_val = ms_ssim(self.fake_H, self.real_H, win_size=self.ssim_window, data_range=1.0, size_average=True, weights=weights)
+                l_ssim = self.l_ssim_w * (1 - ssim_val)
+                l_g_total += l_ssim
+            if self.cri_IQA:
+                l_g_IQA = self.l_IQA_w * (1.0 - torch.mean(self.netI(self.fake_H, self.real_H)))
+                l_g_total += l_g_IQA
+
+            l_g_total.backward()
+            self.optimizer_G.step()
+            self.set_requires_grad(self.netG, False)
+
+            # optimize netI
+            self.set_requires_grad(self.netI, True)
+            self.optimizer_I.zero_grad()
+
+            self.fake_H_detatch = self.fake_H.detach()
+
+            # t1 = time.time()
+            # real_IQA1 = run_vmaf_pytorch(self.fake_H_detatch, self.real_H)
+            # t2 = time.time()
+            real_IQA2 = run_vmaf_pytorch_parallel(self.fake_H_detatch, self.real_H)
+            # t3 = time.time()
+            # print(real_IQA1)
+            # print(real_IQA2)
+            # print(t2 - t1, t3 - t2, '\n')
+            real_IQA = real_IQA2.to(self.device)
+
+            iqa = self.netI(self.fake_H_detatch, self.real_H).squeeze()
+            l_i_IQA = self.cri_IQA(iqa, real_IQA)
+            l_i_IQA.backward()
+
+            self.optimizer_I.step()
+            self.set_requires_grad(self.netI, False)
+
 
         # set log
         self.log_dict['l_pix'] = l_pix.item()
@@ -197,7 +251,9 @@ class SRVmafModel(BaseModel):
         if self.cri_ssim:
             self.log_dict['l_ssim'] = l_ssim.item()
         if self.cri_IQA:
-            self.log_dict['l_IQA'] = l_IQA.item()
+            self.log_dict['l_g_IQA_scale'] = l_g_IQA.item()
+            self.log_dict['l_g_IQA'] = l_g_IQA.item() / self.l_IQA_w
+            self.log_dict['l_i_IQA'] = l_i_IQA.item()
 
     def test(self):
         self.netG.eval()
@@ -273,5 +329,11 @@ class SRVmafModel(BaseModel):
             logger.info('Loading model for G [{:s}] ...'.format(load_path_G))
             self.load_network(load_path_G, self.netG, self.opt['path']['strict_load'])
 
+        load_path_I = self.opt['path']['pretrain_model_I']
+        if load_path_I is not None:
+            logger.info('Loading model for I [{:s}] ...'.format(load_path_I))
+            self.load_network(load_path_I, self.netI, self.opt['path']['strict_load'])
+
     def save(self, iter_label):
         self.save_network(self.netG, 'G', iter_label)
+        self.save_network(self.netI, 'I', iter_label)
